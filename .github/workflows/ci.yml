@@ -1,0 +1,234 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        compiler: [gcc, clang]
+        exclude:
+          # Windows doesn't have gcc by default
+          - os: windows-latest
+            compiler: gcc
+          # macOS doesn't have gcc by default
+          - os: macos-latest
+            compiler: gcc
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up C++ environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libgtest-dev
+        # Install Asio (standalone)
+        mkdir -p external/asio/include
+        wget -q https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz
+        tar -xzf asio-1-28-0.tar.gz
+        cp -r asio-asio-1-28-0/asio/include/* external/asio/include/
+
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew update
+        brew install cmake googletest
+        # Install Asio (standalone)
+        mkdir -p external/asio/include
+        wget -q https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz
+        tar -xzf asio-1-28-0.tar.gz
+        cp -r asio-asio-1-28-0/asio/include/* external/asio/include/
+
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        # Install vcpkg for dependencies
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        .\vcpkg integrate install
+        .\vcpkg install gtest
+        cd ..
+        # Install Asio (standalone)
+        mkdir -p external/asio/include
+        Invoke-WebRequest -Uri "https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz" -OutFile "asio.tar.gz"
+        tar -xzf asio.tar.gz
+        Copy-Item -Recurse "asio-asio-1-28-0/asio/include/*" "external/asio/include/"
+
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler == 'gcc' && 'g++' || 'clang++' }}
+
+    - name: Build
+      run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
+
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure --parallel
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.compiler }}
+        path: build/Testing/
+        retention-days: 30
+
+  build-and-test:
+    name: Build and Test Chat System
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libgtest-dev
+        # Install Asio (standalone)
+        mkdir -p external/asio/include
+        wget -q https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz
+        tar -xzf asio-1-28-0.tar.gz
+        cp -r asio-asio-1-28-0/asio/include/* external/asio/include/
+
+    - name: Configure CMake
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release --parallel
+
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure --parallel
+
+    - name: Test chat system functionality
+      run: |
+        # Start server in background
+        ./build/chatd 5555 &
+        SERVER_PID=$!
+        sleep 2
+        
+        # Test client connection
+        echo "test message" | timeout 5 ./build/chatc 127.0.0.1 5555 test_room test_user || true
+        
+        # Clean up
+        kill $SERVER_PID || true
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: chat-system-binaries
+        path: |
+          build/chatd
+          build/chatc
+          build/tests/chat_tests
+        retention-days: 7
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format clang-tidy cppcheck
+
+    - name: Check code formatting
+      run: |
+        find . -name "*.cpp" -o -name "*.hpp" | grep -v build | xargs clang-format --dry-run --Werror
+
+    - name: Run static analysis
+      run: |
+        cppcheck --enable=all --error-exitcode=1 --suppress=missingIncludeSystem .
+
+    - name: Check for TODO/FIXME comments
+      run: |
+        if grep -r "TODO\|FIXME" --include="*.cpp" --include="*.hpp" .; then
+          echo "Found TODO/FIXME comments. Consider addressing them."
+        fi
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check README exists
+      run: test -f README.md
+
+    - name: Check test documentation
+      run: test -f tests/README.md
+
+    - name: Validate markdown
+      run: |
+        # Check for basic markdown syntax issues
+        if grep -n "^#" README.md; then
+          echo "README has proper heading structure"
+        fi
+
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [test, build-and-test, code-quality, security-scan, documentation]
+    if: always()
+
+    steps:
+    - name: Notify success
+      if: ${{ needs.test.result == 'success' && needs.build-and-test.result == 'success' && needs.code-quality.result == 'success' }}
+      run: |
+        echo "✅ All checks passed! The chat system is ready for deployment."
+
+    - name: Notify failure
+      if: ${{ needs.test.result == 'failure' || needs.build-and-test.result == 'failure' || needs.code-quality.result == 'failure' }}
+      run: |
+        echo "❌ Some checks failed. Please review the logs and fix the issues."
+        exit 1

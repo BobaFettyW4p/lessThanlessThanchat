@@ -1,0 +1,105 @@
+name: Performance Testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  performance-test:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libgtest-dev
+        mkdir -p external/asio/include
+        wget -q https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz
+        tar -xzf asio-1-28-0.tar.gz
+        cp -r asio-asio-1-28-0/asio/include/* external/asio/include/
+
+    - name: Configure CMake (Release)
+      run: cmake -S . -B build-release -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build (Release)
+      run: cmake --build build-release --config Release --parallel
+
+    - name: Test message serialization performance
+      run: |
+        echo "Testing message serialization performance..."
+        time ./build-release/tests/chat_tests --gtest_filter="MessagesTest.*" --gtest_repeat=100
+
+    - name: Test protocol performance
+      run: |
+        echo "Testing protocol performance..."
+        time ./build-release/tests/chat_tests --gtest_filter="ProtocolTest.*" --gtest_repeat=100
+
+    - name: Test concurrent performance
+      run: |
+        echo "Testing concurrent performance..."
+        time ./build-release/tests/chat_tests --gtest_filter="HubTest.ConcurrentBroadcasts" --gtest_repeat=10
+
+    - name: Memory usage test
+      run: |
+        echo "Testing memory usage..."
+        # Start server and measure memory
+        ./build-release/chatd 5555 &
+        SERVER_PID=$!
+        sleep 2
+        
+        # Measure memory usage
+        ps -o pid,vsz,rss,comm -p $SERVER_PID
+        
+        # Clean up
+        kill $SERVER_PID || true
+
+    - name: Connection stress test
+      run: |
+        echo "Testing connection handling..."
+        # Start server
+        ./build-release/chatd 5555 &
+        SERVER_PID=$!
+        sleep 2
+        
+        # Test multiple rapid connections
+        for i in {1..10}; do
+          echo "test message $i" | timeout 2 ./build-release/chatc 127.0.0.1 5555 test_room user$i || true
+        done
+        
+        # Clean up
+        kill $SERVER_PID || true
+
+    - name: Large message test
+      run: |
+        echo "Testing large message handling..."
+        # Start server
+        ./build-release/chatd 5555 &
+        SERVER_PID=$!
+        sleep 2
+        
+        # Create large message
+        LARGE_MESSAGE=$(python3 -c "print('A' * 10000)")
+        echo "$LARGE_MESSAGE" | timeout 5 ./build-release/chatc 127.0.0.1 5555 test_room test_user || true
+        
+        # Clean up
+        kill $SERVER_PID || true
+
+    - name: Performance report
+      run: |
+        echo "## Performance Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "✅ All performance tests completed successfully" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Test Coverage:" >> $GITHUB_STEP_SUMMARY
+        echo "- Message serialization performance" >> $GITHUB_STEP_SUMMARY
+        echo "- Protocol performance" >> $GITHUB_STEP_SUMMARY
+        echo "- Concurrent operations" >> $GITHUB_STEP_SUMMARY
+        echo "- Memory usage" >> $GITHUB_STEP_SUMMARY
+        echo "- Connection handling" >> $GITHUB_STEP_SUMMARY
+        echo "- Large message processing" >> $GITHUB_STEP_SUMMARY

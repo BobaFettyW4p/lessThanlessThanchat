@@ -1,0 +1,667 @@
+# Build directories
+build/
+build-*/
+cmake-build-*/
+out/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Executables
+*.exe
+*.out
+*.app
+chatd
+chatc
+chat_tests
+
+# Object files
+*.o
+*.obj
+*.lo
+*.slo
+*.ko
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+# IDE and Editor files
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# CLion
+.idea/
+cmake-build-*/
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+Makefile*
+*build-*
+
+# Xcode
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+# Eclipse
+.project
+.cproject
+.settings/
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
+.recommenders
+
+# Code::Blocks
+*.depend
+*.layout
+*.cbp
+*.depend
+*.layout
+*.cbp
+
+# Dev-C++
+*.dev
+
+# Compiler specific
+# GCC
+*.d
+*.dylib
+*.dll
+*.so
+*.so.*
+*.a
+*.lib
+*.o
+*.obj
+
+# Clang
+*.d
+*.dylib
+*.dll
+*.so
+*.so.*
+*.a
+*.lib
+*.o
+*.obj
+
+# MSVC
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Test results
+test-results/
+Testing/
+coverage/
+coverage-html/
+*.gcov
+*.gcda
+*.gcno
+lcov.info
+coverage.info
+
+# Package managers
+# Conan
+conandata.yml
+conanfile.txt
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
+
+# vcpkg
+vcpkg_installed/
+.vcpkg-root
+
+# Hunter
+_hunter/
+
+# External dependencies (if downloaded)
+external/asio/
+asio-*
+*.tar.gz
+*.zip
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Python (if any Python scripts are added)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Local configuration files
+config.local.*
+*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Archive files (unless specifically needed)
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Documentation build
+docs/build/
+docs/_build/
+site/
+
+# Profiling data
+*.prof
+gmon.out
+callgrind.out.*
+cachegrind.out.*
+massif.out.*
+
+# Memory check
+valgrind-out.txt
+*.memcheck
+
+# Static analysis
+cppcheck-results.xml
+clang-tidy-results.xml
+
+# Benchmark results
+benchmark-results/
+*.benchmark
+
+# Performance profiling
+perf.data*
+*.perf
+
+# Core dumps
+core
+core.*
+*.core
+
+# Crash dumps
+*.dmp
+
+# Minidumps
+*.mdmp
+
+# System files
+*.sys
+*.drv
+
+# Temporary internet files
+*.tmp
+
+# Office temporary files
+~$*
+
+# Adobe temporary files
+*.tmp
+
+# Photoshop temporary files
+*.psd
+
+# Illustrator temporary files
+*.ai
+
+# InDesign temporary files
+*.indd
+
+# Acrobat temporary files
+*.pdf
+
+# Final Cut Pro temporary files
+*.fcp
+
+# iMovie temporary files
+*.imov
+
+# GarageBand temporary files
+*.band
+
+# Logic Pro temporary files
+*.logic
+
+# Pro Tools temporary files
+*.ptx
+
+# Cubase temporary files
+*.cpr
+
+# Ableton Live temporary files
+*.als
+
+# FL Studio temporary files
+*.flp
+
+# Reason temporary files
+*.reason
+
+# Reaper temporary files
+*.rpp
+
+# Studio One temporary files
+*.song
+
+# Bitwig Studio temporary files
+*.bwproject
+
+# Ardour temporary files
+*.ardour
+
+# Audacity temporary files
+*.aup
+
+# LMMS temporary files
+*.mmpz
+
+# Rosegarden temporary files
+*.rg
+
+# Qt temporary files
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+Makefile*
+*build-*
+
+# Qt Creator
+CMakeLists.txt.user*
+
+# Qt Linguist
+*.qm
+
+# Qt Designer
+*.ui.bak
+
+# Qt Assistant
+*.qhc
+*.qch
+
+# Qt Help
+*.qhp
+
+# Qt Installer Framework
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Qt Creator
+CMakeLists.txt.user*
+
+# Qt Linguist
+*.qm
+
+# Qt Designer
+*.ui.bak
+
+# Qt Assistant
+*.qhc
+*.qch
+
+# Qt Help
+*.qhp
+
+# Qt Installer Framework
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Custom project-specific ignores
+# Add any project-specific files or directories here

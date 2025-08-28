@@ -1,0 +1,153 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-release:
+    name: Build Release ${{ github.event.inputs.version || github.ref_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libgtest-dev
+        mkdir -p external/asio/include
+        wget -q https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz
+        tar -xzf asio-1-28-0.tar.gz
+        cp -r asio-asio-1-28-0/asio/include/* external/asio/include/
+
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew update
+        brew install cmake googletest
+        mkdir -p external/asio/include
+        wget -q https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz
+        tar -xzf asio-1-28-0.tar.gz
+        cp -r asio-asio-1-28-0/asio/include/* external/asio/include/
+
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        .\vcpkg integrate install
+        .\vcpkg install gtest
+        cd ..
+        mkdir -p external/asio/include
+        Invoke-WebRequest -Uri "https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz" -OutFile "asio.tar.gz"
+        tar -xzf asio.tar.gz
+        Copy-Item -Recurse "asio-asio-1-28-0/asio/include/*" "external/asio/include/"
+
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+    - name: Build
+      run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
+
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure --parallel
+
+    - name: Create release archive (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        VERSION=${{ github.event.inputs.version || github.ref_name }}
+        mkdir -p release/chat-$VERSION-${{ matrix.os }}
+        cp build/chatd build/chatc release/chat-$VERSION-${{ matrix.os }}/
+        cp README.md LICENSE* release/chat-$VERSION-${{ matrix.os }}/ 2>/dev/null || true
+        cd release
+        tar -czf chat-$VERSION-${{ matrix.os }}.tar.gz chat-$VERSION-${{ matrix.os }}/
+
+    - name: Create release archive (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        $VERSION = "${{ github.event.inputs.version || github.ref_name }}"
+        New-Item -ItemType Directory -Path "release\chat-$VERSION-windows" -Force
+        Copy-Item "build\chatd.exe" "release\chat-$VERSION-windows\"
+        Copy-Item "build\chatc.exe" "release\chat-$VERSION-windows\"
+        Copy-Item "README.md" "release\chat-$VERSION-windows\" -ErrorAction SilentlyContinue
+        Copy-Item "LICENSE*" "release\chat-$VERSION-windows\" -ErrorAction SilentlyContinue
+        Compress-Archive -Path "release\chat-$VERSION-windows" -DestinationPath "release\chat-$VERSION-windows.zip"
+
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: chat-${{ github.event.inputs.version || github.ref_name }}-${{ matrix.os }}
+        path: release/
+        retention-days: 30
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Chat System ${{ github.ref_name }}
+        body: |
+          ## Chat System ${{ github.ref_name }}
+          
+          A fully functional multithreaded terminal chat system with server and client components.
+          
+          ### Features
+          - **Networking**: Asio-based async I/O with TCP sockets
+          - **Threading**: Thread pool with thread-safe message queues
+          - **Memory Management**: Smart pointers for safe session lifetimes
+          - **Message Protocol**: Binary framing with type-safe serialization
+          - **Room Support**: Multi-room chat with automatic message broadcasting
+          - **Cross-Platform**: Works on Linux, macOS, and Windows
+          
+          ### Downloads
+          - **Linux**: `chat-${{ github.ref_name }}-ubuntu-latest.tar.gz`
+          - **macOS**: `chat-${{ github.ref_name }}-macos-latest.tar.gz`
+          - **Windows**: `chat-${{ github.ref_name }}-windows-latest.zip`
+          
+          ### Usage
+          ```bash
+          # Server
+          ./chatd 5555
+          
+          # Client
+          ./chatc 127.0.0.1 5555 room_name username
+          ```
+        files: |
+          artifacts/*/chat-*.tar.gz
+          artifacts/*/chat-*.zip
+        draft: false
+        prerelease: false

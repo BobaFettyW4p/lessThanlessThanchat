@@ -1,0 +1,88 @@
+name: Code Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libgtest-dev lcov
+        mkdir -p external/asio/include
+        wget -q https://github.com/chriskohlhoff/asio/archive/asio-1-28-0.tar.gz
+        tar -xzf asio-1-28-0.tar.gz
+        cp -r asio-asio-1-28-0/asio/include/* external/asio/include/
+
+    - name: Configure CMake (Debug with coverage)
+      run: |
+        cmake -S . -B build-coverage \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
+          -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+
+    - name: Build
+      run: cmake --build build-coverage --config Debug --parallel
+
+    - name: Run tests
+      run: |
+        cd build-coverage
+        ctest --output-on-failure --parallel
+
+    - name: Generate coverage report
+      run: |
+        cd build-coverage
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info
+        lcov --remove coverage.info '*/external/*' --output-file coverage.info
+        lcov --remove coverage.info '*/tests/*' --output-file coverage.info
+
+    - name: Generate HTML coverage report
+      run: |
+        cd build-coverage
+        genhtml coverage.info --output-directory coverage-html
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: build-coverage/coverage.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: build-coverage/coverage-html/
+        retention-days: 30
+
+    - name: Coverage summary
+      run: |
+        cd build-coverage
+        echo "## Code Coverage Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Extract coverage percentage
+        COVERAGE=$(lcov --summary coverage.info | grep "lines" | awk '{print $2}' | sed 's/%//')
+        echo "**Total Coverage: ${COVERAGE}%**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Coverage by file
+        echo "### Coverage by File:" >> $GITHUB_STEP_SUMMARY
+        lcov --summary coverage.info | grep -A 20 "Reading tracefile" | grep -E "\.cpp|\.hpp" | while read line; do
+          echo "- $line" >> $GITHUB_STEP_SUMMARY
+        done
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 Detailed coverage report available in artifacts" >> $GITHUB_STEP_SUMMARY

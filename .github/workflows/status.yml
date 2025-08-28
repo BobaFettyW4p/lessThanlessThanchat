@@ -1,0 +1,29 @@
+name: Workflow Status
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline", "Performance Testing", "Code Coverage"]
+    types: [completed]
+
+jobs:
+  status-check:
+    name: Overall Status Check
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion != 'skipped'
+
+    steps:
+    - name: Check workflow results
+      run: |
+        echo "## Workflow Status Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+          echo "✅ **${{ github.event.workflow_run.name }}** - PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **${{ github.event.workflow_run.name }}** - FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Workflow: ${{ github.event.workflow_run.name }}" >> $GITHUB_STEP_SUMMARY
+        echo "Conclusion: ${{ github.event.workflow_run.conclusion }}" >> $GITHUB_STEP_SUMMARY
+        echo "URL: ${{ github.event.workflow_run.html_url }}" >> $GITHUB_STEP_SUMMARY
