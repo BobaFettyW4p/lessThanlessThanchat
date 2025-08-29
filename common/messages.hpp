@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <span>
@@ -17,8 +18,7 @@ inline std::vector<std::byte> to_bytes(const ChatLine &m) {
   auto put = [](std::vector<std::byte> &out, std::string_view s) {
     uint32_t n = static_cast<uint32_t>(s.size());
     // length is little platform-endian here; framing converts separately
-    out.insert(out.end(), reinterpret_cast<std::byte *>(&n),
-               reinterpret_cast<std::byte *>(&n) + 4);
+    out.insert(out.end(), reinterpret_cast<std::byte *>(&n), reinterpret_cast<std::byte *>(&n) + 4);
     out.insert(out.end(), reinterpret_cast<const std::byte *>(s.data()),
                reinterpret_cast<const std::byte *>(s.data()) + s.size());
   };

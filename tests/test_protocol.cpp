@@ -147,7 +147,8 @@ TEST_F(ProtocolTest, FrameRoundTrip) {
   auto frame = make_frame(original);
 
   // Extract payload
-  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader), frame.size() - sizeof(FrameHeader));
+  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader),
+                                     frame.size() - sizeof(FrameHeader));
 
   // Deserialize message
   ChatLine deserialized = from_bytes<ChatLine>(payload);
@@ -168,7 +169,8 @@ TEST_F(ProtocolTest, FrameWithSpecialCharacters) {
   auto frame = make_frame(msg);
 
   // Extract and deserialize
-  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader), frame.size() - sizeof(FrameHeader));
+  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader),
+                                     frame.size() - sizeof(FrameHeader));
   ChatLine deserialized = from_bytes<ChatLine>(payload);
 
   EXPECT_EQ(msg.room, deserialized.room);
