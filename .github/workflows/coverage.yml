@@ -37,12 +37,29 @@ jobs:
     - name: Run tests
       run: |
         cd build-coverage
+        # Run tests directly to ensure they execute and generate coverage data
+        ./tests/chat_tests
+        # Also run via ctest for consistency
         ctest --output-on-failure --parallel
+
+    - name: Debug coverage setup
+      run: |
+        cd build-coverage
+        echo "=== Checking for .gcda files ==="
+        find . -name "*.gcda" -type f
+        echo "=== Checking for .gcno files ==="
+        find . -name "*.gcno" -type f
+        echo "=== Checking test executable ==="
+        ls -la tests/
+        echo "=== Checking if tests were run ==="
+        ls -la tests/CMakeFiles/chat_tests.dir/
 
     - name: Generate coverage report
       run: |
         cd build-coverage
-        lcov --capture --directory . --output-file coverage.info
+        # Generate coverage data using geninfo (part of lcov)
+        geninfo . --output-filename coverage.info --ignore-errors empty
+        # Filter out system and external files
         lcov --remove coverage.info '/usr/*' --output-file coverage.info
         lcov --remove coverage.info '*/external/*' --output-file coverage.info
         lcov --remove coverage.info '*/tests/*' --output-file coverage.info
