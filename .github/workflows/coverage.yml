@@ -53,16 +53,38 @@ jobs:
         ls -la tests/
         echo "=== Checking if tests were run ==="
         ls -la tests/CMakeFiles/chat_tests.dir/
+        echo "=== Checking coverage data files ==="
+        find . -name "*.gcda" -exec ls -la {} \;
+        echo "=== Checking gcov version ==="
+        gcov --version
 
     - name: Generate coverage report
       run: |
         cd build-coverage
-        # Generate coverage data using geninfo (part of lcov)
-        geninfo . --output-filename coverage.info --ignore-errors empty
+        # Try geninfo first with error handling
+        if ! geninfo . --output-filename coverage.info \
+          --ignore-errors empty,mismatch,unexecuted \
+          --rc geninfo_unexecuted_blocks=1; then
+          echo "geninfo failed, trying lcov --capture as fallback"
+          # Fallback to lcov --capture
+          lcov --capture --directory . --output-file coverage.info \
+            --ignore-errors mismatch,unexecuted
+        fi
+        
         # Filter out system and external files
         lcov --remove coverage.info '/usr/*' --output-file coverage.info
         lcov --remove coverage.info '*/external/*' --output-file coverage.info
         lcov --remove coverage.info '*/tests/*' --output-file coverage.info
+        
+        # Check if coverage.info was created successfully
+        if [ ! -f coverage.info ]; then
+          echo "ERROR: coverage.info was not created"
+          exit 1
+        fi
+        
+        # Show coverage summary
+        echo "=== Coverage Summary ==="
+        lcov --summary coverage.info
 
     - name: Generate HTML coverage report
       run: |
