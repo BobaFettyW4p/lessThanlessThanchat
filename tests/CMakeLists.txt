@@ -19,6 +19,12 @@ target_link_libraries(chat_tests PRIVATE
     GTest::gtest_main
 )
 
+# Set RPATH to find Google Test libraries
+set_target_properties(chat_tests PROPERTIES
+    INSTALL_RPATH "/usr/local/Caskroom/miniconda/base/lib"
+    BUILD_WITH_INSTALL_RPATH TRUE
+)
+
 # Enable testing
 enable_testing()
 add_test(NAME chat_tests COMMAND chat_tests)
