@@ -63,8 +63,7 @@ TEST_F(ProtocolTest, MakeFrameBasic) {
   EXPECT_EQ(header_type(header), ChatLine::type_id);
   EXPECT_EQ(header_len(header), frame.size() - sizeof(FrameHeader));
   EXPECT_EQ(header_len(header),
-            msg.room.size() + msg.user.size() + msg.text.size() +
-                12); // 3 * 4 bytes for lengths
+            msg.room.size() + msg.user.size() + msg.text.size() + 12); // 3 * 4 bytes for lengths
 }
 
 TEST_F(ProtocolTest, MakeFrameEmptyMessage) {
@@ -148,8 +147,7 @@ TEST_F(ProtocolTest, FrameRoundTrip) {
   auto frame = make_frame(original);
 
   // Extract payload
-  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader),
-                                    frame.size() - sizeof(FrameHeader));
+  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader), frame.size() - sizeof(FrameHeader));
 
   // Deserialize message
   ChatLine deserialized = from_bytes<ChatLine>(payload);
@@ -170,8 +168,7 @@ TEST_F(ProtocolTest, FrameWithSpecialCharacters) {
   auto frame = make_frame(msg);
 
   // Extract and deserialize
-  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader),
-                                    frame.size() - sizeof(FrameHeader));
+  std::span<const std::byte> payload(frame.data() + sizeof(FrameHeader), frame.size() - sizeof(FrameHeader));
   ChatLine deserialized = from_bytes<ChatLine>(payload);
 
   EXPECT_EQ(msg.room, deserialized.room);

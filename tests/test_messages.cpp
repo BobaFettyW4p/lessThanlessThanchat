@@ -24,8 +24,7 @@ TEST_F(MessagesTest, ChatLineSerializationBasic) {
 
   // Check that we have the expected size
   // 3 * 4 bytes for string lengths + actual string data
-  size_t expected_size =
-      4 + msg.room.size() + 4 + msg.user.size() + 4 + msg.text.size();
+  size_t expected_size = 4 + msg.room.size() + 4 + msg.user.size() + 4 + msg.text.size();
   EXPECT_EQ(bytes.size(), expected_size);
 }
 
@@ -138,8 +137,7 @@ TEST_F(MessagesTest, ChatLineNullBytes) {
 
 TEST_F(MessagesTest, SerializableConcept) {
   // Test that ChatLine satisfies the Serializable concept
-  static_assert(Serializable<ChatLine>,
-                "ChatLine should satisfy Serializable concept");
+  static_assert(Serializable<ChatLine>, "ChatLine should satisfy Serializable concept");
 
   ChatLine msg;
   msg.room = "test";
@@ -170,8 +168,7 @@ TEST_F(MessagesTest, DeserializationErrorHandling) {
       std::byte{0xFF}, // length = 255
       std::byte{0x00}, std::byte{0x00}, std::byte{0x00},
       std::byte{0x00}, // user length = 0
-      std::byte{0x00}, std::byte{0x00}, std::byte{0x00},
-      std::byte{0x00} // text length = 0
+      std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00} // text length = 0
       // Missing 255 bytes of room data
   };
   EXPECT_THROW(from_bytes<ChatLine>(bad_length_data), std::runtime_error);

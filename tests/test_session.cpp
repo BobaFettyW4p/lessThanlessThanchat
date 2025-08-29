@@ -62,8 +62,7 @@ TEST_F(SessionTest, SessionSendRawData) {
   auto session = std::make_shared<Session>(std::move(socket), hub);
 
   // Create raw data
-  std::vector<std::byte> data = {std::byte{0x01}, std::byte{0x02},
-                                 std::byte{0x03}};
+  std::vector<std::byte> data = {std::byte{0x01}, std::byte{0x02}, std::byte{0x03}};
 
   // Send raw data (this should not crash even with a mock socket)
   EXPECT_NO_THROW(session->send_raw(data));

@@ -5,9 +5,9 @@
 #include "server/session.hpp"
 #include "server/hub.hpp"
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   using asio::ip::tcp;
-  uint16_t port = (argc>1)? static_cast<uint16_t>(std::stoi(argv[1])) : 5555;
+  uint16_t port = (argc > 1) ? static_cast<uint16_t>(std::stoi(argv[1])) : 5555;
 
   asio::io_context io;
   auto hub = std::make_shared<Hub>();
@@ -16,8 +16,8 @@ int main(int argc, char** argv) {
   tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), port));
 
   std::function<void()> do_accept;
-  do_accept = [&]{
-    acceptor.async_accept([&](std::error_code ec, tcp::socket sock){
+  do_accept = [&] {
+    acceptor.async_accept([&](std::error_code ec, tcp::socket sock) {
       if (!ec) {
         auto s = std::make_shared<Session>(std::move(sock), hub);
         s->start();
