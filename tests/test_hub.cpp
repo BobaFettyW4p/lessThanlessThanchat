@@ -10,11 +10,11 @@
 
 class HubTest : public ::testing::Test {
 protected:
-  void SetUp() override {
+  void SetUp() override { // NOLINT(misc-unused-function)
     hub = std::make_shared<Hub>();
   }
 
-  void TearDown() override {
+  void TearDown() override { // NOLINT(misc-unused-function)
     hub.reset();
   }
 
