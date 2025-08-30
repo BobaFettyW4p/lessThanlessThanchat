@@ -1,11 +1,11 @@
-#include <asio.hpp>
-#include <thread>
-#include <iostream>
-#include <vector>
-#include <array>
-#include <cstring>
-#include "common/protocol.hpp"
 #include "common/messages.hpp"
+#include "common/protocol.hpp"
+#include <array>
+#include <asio.hpp>
+#include <cstring>
+#include <iostream>
+#include <thread>
+#include <vector>
 
 int main(int argc, char **argv) {
   using asio::ip::tcp;
@@ -33,8 +33,8 @@ int main(int argc, char **argv) {
       std::vector<std::byte> payload(len);
       asio::read(sock, asio::buffer(payload));
       if (type == ChatLine::type_id) {
-        ChatLine msg = from_bytes<ChatLine>(
-            std::span<const std::byte>(payload.data(), payload.size()));
+        ChatLine msg =
+            from_bytes<ChatLine>(std::span<const std::byte>(payload.data(), payload.size()));
         std::cout << "[" << msg.room << "] " << msg.user << ": " << msg.text << "\n";
       } else {
         std::cout << "(unknown message type " << type << ")\n";

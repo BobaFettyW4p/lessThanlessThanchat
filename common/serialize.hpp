@@ -1,9 +1,9 @@
 #pragma once
 
+#include <cstddef>
+#include <span>
 #include <type_traits>
 #include <vector>
-#include <span>
-#include <cstddef>
 
 // Declaration for from_bytes; specializations provided per message type.
 template <class T>

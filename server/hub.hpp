@@ -1,12 +1,12 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
-#include <memory>
-#include <vector>
-#include <mutex>
 #include <algorithm>
 #include <functional>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 class Session;
 
@@ -14,17 +14,13 @@ class Hub : public std::enable_shared_from_this<Hub> {
   using WeakSess = std::weak_ptr<Session>;
   using SendCallback = std::function<void(const std::vector<std::byte> &)>;
   std::mutex m_;
-  std::unordered_map<std::string,
-                     std::vector<std::pair<WeakSess, SendCallback>>>
-      rooms_;
+  std::unordered_map<std::string, std::vector<std::pair<WeakSess, SendCallback>>> rooms_;
 
 public:
-  void join(const std::string &room, std::shared_ptr<Session> s,
-            SendCallback send_cb) {
+  void join(const std::string &room, std::shared_ptr<Session> s, SendCallback send_cb) {
     std::scoped_lock lk(m_);
     auto &vec = rooms_[room];
-    vec.erase(std::remove_if(vec.begin(), vec.end(),
-                             [](auto &p) { return p.first.expired(); }),
+    vec.erase(std::remove_if(vec.begin(), vec.end(), [](auto &p) { return p.first.expired(); }),
               vec.end());
     vec.emplace_back(s, send_cb);
   }

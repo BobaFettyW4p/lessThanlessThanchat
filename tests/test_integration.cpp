@@ -1,15 +1,15 @@
-#include <gtest/gtest.h>
-#include <asio.hpp>
-#include <thread>
-#include <chrono>
-#include <atomic>
-#include <vector>
-#include <string>
-#include <memory>
-#include "../common/protocol.hpp"
 #include "../common/messages.hpp"
+#include "../common/protocol.hpp"
 #include "../server/hub.hpp"
 #include "../server/session.hpp"
+#include <asio.hpp>
+#include <atomic>
+#include <chrono>
+#include <gtest/gtest.h>
+#include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
 class IntegrationTest : public ::testing::Test {
 protected:

@@ -1,7 +1,7 @@
-#include <gtest/gtest.h>
-#include "../common/protocol.hpp"
 #include "../common/messages.hpp"
 #include "../common/net_endian.hpp"
+#include "../common/protocol.hpp"
+#include <gtest/gtest.h>
 
 class ProtocolTest : public ::testing::Test {
 protected:

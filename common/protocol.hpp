@@ -1,12 +1,12 @@
 #pragma once
 
-#include <vector>
-#include <cstdint>
-#include <span>
-#include <asio.hpp>
-#include "serialize.hpp"
 #include "messages.hpp"
 #include "net_endian.hpp"
+#include "serialize.hpp"
+#include <asio.hpp>
+#include <cstdint>
+#include <span>
+#include <vector>
 
 struct FrameHeader {
   uint32_t len_be;   // payload length in bytes (big-endian)

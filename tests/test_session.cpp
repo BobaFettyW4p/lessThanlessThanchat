@@ -1,11 +1,11 @@
-#include <gtest/gtest.h>
+#include "../common/messages.hpp"
+#include "../server/hub.hpp"
+#include "../server/session.hpp"
 #include <asio.hpp>
+#include <chrono>
+#include <gtest/gtest.h>
 #include <memory>
 #include <thread>
-#include <chrono>
-#include "../server/session.hpp"
-#include "../server/hub.hpp"
-#include "../common/messages.hpp"
 
 class SessionTest : public ::testing::Test {
 protected:

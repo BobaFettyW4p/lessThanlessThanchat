@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "../common/net_endian.hpp"
+#include <gtest/gtest.h>
 
 class NetEndianTest : public ::testing::Test {
 protected:

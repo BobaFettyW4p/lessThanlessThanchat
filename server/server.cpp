@@ -1,9 +1,9 @@
+#include "common/thread_pool.hpp"
+#include "server/hub.hpp"
+#include "server/session.hpp"
 #include <asio.hpp>
 #include <iostream>
 #include <memory>
-#include "common/thread_pool.hpp"
-#include "server/session.hpp"
-#include "server/hub.hpp"
 
 int main(int argc, char **argv) {
   using asio::ip::tcp;

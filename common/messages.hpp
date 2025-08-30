@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <span>
+#include "serialize.hpp"
 #include <cstddef>
 #include <cstring>
-#include "serialize.hpp"
+#include <span>
+#include <string>
+#include <vector>
 
 struct ChatLine {
   static constexpr uint16_t type_id = 1;

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <asio.hpp>
-#include <memory>
-#include <vector>
-#include <string>
-#include <functional>
-#include "common/protocol.hpp"
 #include "common/messages.hpp"
+#include "common/protocol.hpp"
+#include <asio.hpp>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 
 class Hub; // forward declaration
 

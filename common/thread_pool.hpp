@@ -1,10 +1,10 @@
 #pragma once
 
-#include <thread>
-#include <functional>
-#include <vector>
-#include <atomic>
 #include "ts_queue.hpp"
+#include <atomic>
+#include <functional>
+#include <thread>
+#include <vector>
 
 class ThreadPool {
   TsQueue<std::function<void()>> work_;

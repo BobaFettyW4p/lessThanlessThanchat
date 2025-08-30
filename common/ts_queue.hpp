@@ -1,9 +1,9 @@
 #pragma once
 
-#include <mutex>
-#include <queue>
 #include <condition_variable>
+#include <mutex>
 #include <optional>
+#include <queue>
 
 template <class T>
 class TsQueue {

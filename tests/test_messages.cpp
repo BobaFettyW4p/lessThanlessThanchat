@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
 #include "../common/messages.hpp"
 #include "../common/serialize.hpp"
+#include <gtest/gtest.h>
 
 class MessagesTest : public ::testing::Test {
 protected:
@@ -170,7 +170,7 @@ TEST_F(MessagesTest, DeserializationErrorHandling) {
       std::byte{0x00}, // user length = 0
       std::byte{0x00}, std::byte{0x00}, std::byte{0x00},
       std::byte{0x00} // text length = 0
-      // Missing 255 bytes of room data
+                      // Missing 255 bytes of room data
   };
   EXPECT_THROW(from_bytes<ChatLine>(bad_length_data), std::runtime_error);
 }
