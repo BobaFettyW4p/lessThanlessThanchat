@@ -168,7 +168,8 @@ TEST_F(MessagesTest, DeserializationErrorHandling) {
       std::byte{0xFF}, // length = 255
       std::byte{0x00}, std::byte{0x00}, std::byte{0x00},
       std::byte{0x00}, // user length = 0
-      std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00} // text length = 0
+      std::byte{0x00}, std::byte{0x00}, std::byte{0x00},
+      std::byte{0x00} // text length = 0
       // Missing 255 bytes of room data
   };
   EXPECT_THROW(from_bytes<ChatLine>(bad_length_data), std::runtime_error);

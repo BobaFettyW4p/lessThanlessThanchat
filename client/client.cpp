@@ -33,7 +33,8 @@ int main(int argc, char **argv) {
       std::vector<std::byte> payload(len);
       asio::read(sock, asio::buffer(payload));
       if (type == ChatLine::type_id) {
-        ChatLine msg = from_bytes<ChatLine>(std::span<const std::byte>(payload.data(), payload.size()));
+        ChatLine msg = from_bytes<ChatLine>(
+            std::span<const std::byte>(payload.data(), payload.size()));
         std::cout << "[" << msg.room << "] " << msg.user << ": " << msg.text << "\n";
       } else {
         std::cout << "(unknown message type " << type << ")\n";

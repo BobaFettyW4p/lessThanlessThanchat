@@ -131,7 +131,10 @@ TEST_F(HubTest, DifferentMessageTypes) {
 
 TEST_F(HubTest, RoomNameVariations) {
   // Test different room name formats
-  std::vector<std::string> room_names = {"lobby", "general", "dev", "test-room", "room_123", "room@domain.com", "room with spaces", "room-with-dashes", "room_with_underscores", "room.with.dots"};
+  std::vector<std::string> room_names = {
+      "lobby", "general", "dev", "test-room", "room_123", "room@domain.com",
+      "room with spaces", "room-with-dashes", "room_with_underscores",
+      "room.with.dots"};
 
   for (const auto &room_name : room_names) {
     ChatLine msg;
