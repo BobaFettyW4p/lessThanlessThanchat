@@ -106,7 +106,6 @@ TEST_F(SessionIntegrationTest, SessionStartAndJoin) {
   // We'll use a mock callback to capture the join operation
 
   std::atomic<bool> session_started{false};
-  std::string joined_room;
 
   // Set up acceptor to accept one connection
   std::thread server_thread([&]() {

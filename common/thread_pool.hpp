@@ -33,7 +33,7 @@ public:
       if (t.joinable())
         t.join();
   }
-  void submit(std::function<void()> f) {
+  void submit(std::function<void()> f) { // NOLINT(misc-unused-function)
     work_.push(std::move(f));
   }
 };

@@ -40,7 +40,7 @@ public:
       }
     }
     auto frame_data = make_frame(f);
-    for (auto &cb : targets)
+    for (const auto &cb : targets)
       cb(frame_data);
   }
 };
